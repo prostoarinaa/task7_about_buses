@@ -215,9 +215,10 @@ public:
             Gates[maxOfGates].LoadingOrUploading = 0;
           //  Buses.push(bus);
         }
-        for (int i=0; i<5; i++){
-            cout << "G " << i << " =  " << Gates[i].howMuch<< endl;
-        }
+//        for (int i=0; i<5; i++){
+//            cout << "G " << i << " =  " << Gates[i].howMuch<< endl;
+//        }
+        this_thread::sleep_for(chrono::milliseconds(2000));
     };
     
     
@@ -262,9 +263,27 @@ void thread2(){
     
     }
 }
+void thread21(){
+    int count = 0;
+    cout<< "START2222222111111"<< endl;
+    BUSES B;
+    Gates = Gat(Gates);
+    while(true) {
+   // if (TIME <= 24) {
+//        TIME = 0;
+        count++;
+        B.GenerateBuses2(Buses1);
+       // if (count == 5)
+        //    break;
+        cout<< "FINISH2222222111111"<< endl;
+     //   cout << "TIME  "<<TIME<< endl;
+   // }
+    
+    }
+}
 void thread3(){
     BUSES B;
-    
+    cout<< "START333333"<< endl;
     int count = 0;
     while(true) {
    // if (TIME <= 24) {
@@ -276,7 +295,7 @@ void thread3(){
         
      //   cout << "TIME  "<<TIME<< endl;
    // }
-    
+        cout<< "FINISH3333333"<< endl;
     }
 }
 int main() {
@@ -312,6 +331,8 @@ int main() {
    // thread t1(thread1);
     thread t1(thread1);
     thread t2(thread2);
+    thread t21(thread21);
+    thread t3(thread3);
     while(true) {
 //        thread t1(thread1);
         count++;
@@ -333,6 +354,8 @@ int main() {
     }
     t1.join();
     t2.join();
+    t21.join();
+    t3.join();
         
    // thread t2(thread2);
  //   thread t3(thread3);
