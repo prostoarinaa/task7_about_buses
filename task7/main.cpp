@@ -1,5 +1,7 @@
 /*
  Задача#7: Есть 3 вида товаров поставляемые в магазины через склад: мясо, фрукты, овощи. Склад с 5 воротами для загрузки/разгрузки, каждые ворота работают для одного вида товара, который разгружают/загружают первым. Вначале 3 ворот зарезервированны для разгрузки каждого вида товара, 2 остальных ворот свободны и могут использоваться и для разгрузки и для загрузки. Ворота могут переключиться  на другой вип товара при загрузке если текущий вид закончился или превышает на 50 тонн текущий. Товары развозят фурами вместимостью по 10 тонн. Скорость разгрузки/загрузки 1 машины 2 тонны в час. Машины, привозящие товар, можно генерировать, к примеру по 15 штук каждые 24 часа.*/
+
+
 #include <iostream>
 #include <string>
 #include <thread>
@@ -15,8 +17,8 @@ struct Bus {
     int numberOfTypeProduct;
 };
 struct Product {
-    int countOfTonProduct;
-    int numberOfTypeProduct;
+    int howMuch;
+    int whatProduct;
 };
 struct Gate {
     int whatProduct = 0; //1,2,3
@@ -42,10 +44,29 @@ vector <Gate> Gat(vector <Gate> Gates) {
     }
     return Gates;
 };
+vector <Product> Prod(vector <Product> Products) {
+    for (int i =0;i < 3;i++) {
+        Product product;
+        if (i == 0) {
+            product.whatProduct = 0;
+        }
+        if (i == 1) {
+            product.whatProduct = 1;
+        }
+        if (i == 2) {
+            product.whatProduct = 2;
+        }
+        product.howMuch = 0;
+        Products.push_back(product);
+
+    }
+    return Products;
+};
 
 vector <Gate> Gates ;
 vector <Product> Products ;
 queue <Bus> Buses1 = {};
+int TIME = 0;
 
 
 class BUSES {
@@ -67,16 +88,20 @@ public:
             for (int i = 0; i < k; i++) {
                 Bus B = Buses.front();
                 WhatEnter(B);
-                cout << "--------------Текущее положение ворот и машины----------------" << endl;
+                cout << "---------Текущее положение ворот, машины и склада с продуктами--------" << endl;
                 this_thread::sleep_for(chrono::milliseconds(10));
                 cout << "BUS № " << i << ", Тонн " << B.countOfTonInABus << ", Продукт № " << B.numberOfTypeProduct << endl << endl;
+                for (int i = 0; i < 3; i++) {
+                    Product product = Products[i];
+                    cout <<"---PRODUCT на складе, тип №: " << product.whatProduct << " , в количестве " << product.howMuch << " ----" << endl;
+                }
                 for (int i = 0; i < g; i++) {
                     Gate G = Gates[i];
                     this_thread::sleep_for(chrono::milliseconds(10));
-                    cout << "GATE № " << i << ", Продукт № " << G.whatProduct << ", в количестве  " << G.howMuch << ", положение " << G.LoadingOrUploading << endl;
+                    cout << "GATE № " << i << ", Продукт № " << G.whatProduct  << ", положение " << G.LoadingOrUploading << endl;
                     this_thread::sleep_for(chrono::milliseconds(10));
                 }
-                cout << "--------------------------------------------------------------" << endl << endl<< endl;
+                cout << "-------------------------------------------------------------------" << endl << endl<< endl;
                 Buses.pop();
             }
         return Buses;
@@ -99,62 +124,62 @@ public:
         this_thread::sleep_for(chrono::milliseconds(1000));
         if (bus.numberOfTypeProduct == 1) {
             
-            if (Gates[1].howMuch < 50) {
+            if (Products[0].howMuch < 50) {
                 Gates[1].whatProduct = 1;
                 Gates[1].LoadingOrUploading = 1;
-                Gates[1].howMuch += bus.countOfTonInABus;
+                Products[0].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
-            else if ((Gates[0].howMuch < 50 && Gates[0].whatProduct == 1) || Gates[0].howMuch == 0) {
+            else if ((Products[0].howMuch < 50 && Gates[0].whatProduct == 1) || Gates[0].howMuch == 0) {
                 Gates[0].whatProduct = 1;
                 Gates[0].LoadingOrUploading = 1;
-                Gates[0].howMuch += bus.countOfTonInABus;
+                Products[0].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
-            else if ((Gates[4].howMuch < 50 && Gates[4].whatProduct == 1) || Gates[4].howMuch == 0) {
-               Gates[4].whatProduct = 1;
+            else if ((Products[0].howMuch < 50 && Gates[4].whatProduct == 1) || Gates[4].howMuch == 0) {
+                Gates[4].whatProduct = 1;
                 Gates[4].LoadingOrUploading = 1;
-                Gates[4].howMuch += bus.countOfTonInABus;
+                Products[0].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
         }
         else if (bus.numberOfTypeProduct == 2) {
-            if (Gates[2].howMuch < 50) {
+            if (Products[1].howMuch < 50) {
                 Gates[2].whatProduct = 2;
                 Gates[2].LoadingOrUploading = 1;
-                Gates[2].howMuch += bus.countOfTonInABus;
+                Products[1].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
-            else if ((Gates[0].howMuch < 50 && Gates[0].whatProduct == 2) || Gates[0].howMuch == 0) {
+            else if ((Products[1].howMuch < 50 && Gates[0].whatProduct == 2) || Gates[0].howMuch == 0) {
                 Gates[0].whatProduct = 2;
                 Gates[0].LoadingOrUploading = 1;
-                Gates[0].howMuch += bus.countOfTonInABus;
+                Products[1].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
-            else if ((Gates[4].howMuch < 50 && Gates[4].whatProduct == 2) || Gates[4].howMuch == 0) {
+            else if ((Products[1].howMuch < 50 && Gates[4].whatProduct == 2) || Gates[4].howMuch == 0) {
                 Gates[4].whatProduct = 2;
                 Gates[4].LoadingOrUploading = 1;
-                Gates[4].howMuch += bus.countOfTonInABus;
+                Products[1].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
         }
         else if (bus.numberOfTypeProduct == 3) {
-            if (Gates[3].howMuch < 50) {
+            if (Products[2].howMuch < 50) {
                 Gates[3].whatProduct = 3;
                 Gates[3].LoadingOrUploading = 1;
-                Gates[3].howMuch += bus.countOfTonInABus;
+                Products[2].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
-            else if ((Gates[0].howMuch < 50 && Gates[0].whatProduct == 3) || Gates[0].howMuch == 0) {
+            else if ((Products[2].howMuch < 50 && Gates[0].whatProduct == 3) || Gates[0].howMuch == 0) {
                 Gates[0].whatProduct = 3;
                 Gates[0].LoadingOrUploading = 1;
-                Gates[0].howMuch += bus.countOfTonInABus;
+                Products[2].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
-            else if ((Gates[4].howMuch < 50 && Gates[4].whatProduct == 3) || Gates[4].howMuch == 0) {
+            else if ((Products[2].howMuch < 50 && Gates[4].whatProduct == 3) || Gates[4].howMuch == 0) {
                 Gates[4].whatProduct = 3;
                 Gates[4].LoadingOrUploading = 1;
-                Gates[4].howMuch += bus.countOfTonInABus;
+                Products[2].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
         }
@@ -167,31 +192,33 @@ public:
         int maxOfGates = 0;
         int max = 0;
             for (int i=0; i<5; i++){
-                if (Gates[i].howMuch >= max) {
-                    max = Gates[i].howMuch;
+                if (Products[i].howMuch >= max) {
+                    max = Products[i].howMuch;
                     maxOfGates = i;
                 }
             }
-        if (Gates[maxOfGates].howMuch >= 50) {
-            Gates[maxOfGates].howMuch -= 50;
-            Gates[maxOfGates].LoadingOrUploading = 0;
+        if (Products[maxOfGates].howMuch >= 50) {
+            Products[maxOfGates].howMuch -= 10;
+           // Products[maxOfGates].LoadingOrUploading = 0;
         }
     };
     
     
 };
-int TIME = 0;
+
 void thread1() {
     int count = 0;
     BUSES B;
     Gates = Gat(Gates);
+    Products = Prod(Products);
     while(true) {
         cout << "////////////////Начало работы 1 потока///////////////" << endl;
         count++;
         B.GenerateBuses(Buses1);
+        TIME = 24;
         for (int i =0 ; i<24;i++) {
             this_thread::sleep_for(chrono::milliseconds(1000));
-            TIME++;
+            TIME--;
         }
         TIME = 0;
         cout << "////////////////Конец работы 1 потока///////////////" << endl;
@@ -238,9 +265,7 @@ void thread3() {
     this_thread::sleep_for(chrono::milliseconds(1000));
     int count = 0;
     while(true) {
-    //    cout<< "////////////////Начало работы 3 потока///////////////"<< endl;
         count++;
-     //   B.WhatExit();
         if(Buses1.size() != 0) {
             cout<< "////////////////Начало работы 3 потока///////////////"<< endl;
             B.WhatExit();
@@ -252,29 +277,20 @@ void thread3() {
             }
             cout<< "////////////////Конец работы 3 потока///////////////"<< endl;
         }
-      //  this_thread::sleep_for(chrono::milliseconds(2000));
-      //  cout<< "////////////////Конец работы 3 потока///////////////"<< endl;
     }
 }
-
+void START(){
+    thread t1(thread1);
+    thread t2(thread2);
+    thread t3(thread3);
+    t2.join();
+    t3.join();
+    t1.join();
+}
 
 int main() {
     setlocale(LC_ALL, "Russian");
-//    int count = 0;
-    thread t1(thread1);
-    thread t2(thread2);
-  //  thread t21(thread21);
-    thread t3(thread3);
-//    while(true) {
-//        count++;
-//      //  cout<<"MAIN"<<endl;   //вывод текущего потока
-//        this_thread::sleep_for(chrono::milliseconds(1000));
-//    }
-   
-    t2.join();
-  //  t21.join();
-    t3.join();
-    t1.join();
+    START();
     return 0;
 }
 //  thread th(print, a, b);
