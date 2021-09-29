@@ -9,9 +9,13 @@
 
 using namespace std;
 using namespace chrono;
-//using namespace thread;
+
 struct Bus {
     int countOfTonInABus;
+    int numberOfTypeProduct;
+};
+struct Product {
+    int countOfTonProduct;
     int numberOfTypeProduct;
 };
 struct Gate {
@@ -31,72 +35,50 @@ vector <Gate> Gat(vector <Gate> Gates) {
         if (i == 3) {
             gate.whatProduct = 3;
         }
-        gate.howMuch=0;
+        gate.howMuch = 0;
+        gate.LoadingOrUploading = 0;
         Gates.push_back(gate);
 
     }
     return Gates;
 };
-vector <Gate> Gates;
+
+vector <Gate> Gates ;
+vector <Product> Products ;
 queue <Bus> Buses1 = {};
-int TIMEG = 24;
-vector <int> TIME = {24, 24, 24, 24, 24};
+
 
 class BUSES {
 public:
-  //  queue <Bus> Buses = {};
+
     queue <Bus> GenerateBuses (queue <Bus>& Buses) {
-//        int timeForUploationOneBus = 0;
- //       cout <<"1 "<< TIMEG << endl;
-//        if (TIME == 24) {
-            int countOfBus = rand()%15 + 1;
-            cout << "countOfBus= "<<countOfBus<< endl;
-//            TIME = 0;
-            for (int i = 0; i < countOfBus; i++) {
-                Buses = AddNewBus(Buses);
-            }
-        return Buses;
+        this_thread::sleep_for(chrono::milliseconds(10));
+        int countOfBus = rand()%30 + 1;
+        cout << "----Количество автобусов, генерируемых каждые 24 часа = " << countOfBus <<"-----"<< endl;
+        for (int i = 0; i < countOfBus; i++) {
+            Buses = AddNewBus(Buses);
+        }
+    return Buses;
     };
+    
     queue <Bus> GenerateBuses2 (queue <Bus>& Buses) {
-        int timeForUploationOneBus = 0;
-        cout << "Start Thread2"<<endl;
             unsigned long k = Buses.size();
-        cout <<"KKKKKK "<< k;
             unsigned long g = Gates.size();
             for (int i = 0; i < k; i++) {
                 Bus B = Buses.front();
                 WhatEnter(B);
-                cout << "/////////WhatEnter()" << endl;
-                //   cout << endl<<endl;
-                timeForUploationOneBus = B.countOfTonInABus/2;
-                for (int i = 0;i < timeForUploationOneBus;i++) {
-                    if (TIMEG < 24) {
-                        TIMEG += 2;
-                    }
-                    else
-                        TIMEG = 0;
-                }
-                //  cout << i<<"  "<<B.countOfTonInABus <<"  "<<B.numberOfTypeProduct<<endl;
-                    for (int i = 0; i < g; i++) {
+                cout << "--------------Текущее положение ворот и машины----------------" << endl;
+                this_thread::sleep_for(chrono::milliseconds(10));
+                cout << "BUS № " << i << ", Тонн " << B.countOfTonInABus << ", Продукт № " << B.numberOfTypeProduct << endl << endl;
+                for (int i = 0; i < g; i++) {
                     Gate G = Gates[i];
-                //    cout << i<<"  "<<G.whatProduct <<"  "<<G.howMuch << "  "<<G.LoadingOrUploading<<endl;
+                    this_thread::sleep_for(chrono::milliseconds(10));
+                    cout << "GATE № " << i << ", Продукт № " << G.whatProduct << ", в количестве  " << G.howMuch << ", положение " << G.LoadingOrUploading << endl;
+                    this_thread::sleep_for(chrono::milliseconds(10));
                 }
-              //  cout << endl<< endl<< endl;
+                cout << "--------------------------------------------------------------" << endl << endl<< endl;
                 Buses.pop();
-                Buses.push(B);
             }
-//            else {
-//                TIME = 0;
-//            }
-        
-//
-//        for (int i = 0; i < g; i++) {
-//            Gate G = Gates[i];
-//            cout << i<<"  "<<G.whatProduct <<"  "<<G.howMuch << "  "<<G.LoadingOrUploading<<endl;
-//           // Gates.pop();
-//           // Gates.push(G);
-//        }
-        
         return Buses;
     };
     
@@ -110,32 +92,26 @@ public:
     
     Bus ReturnFirstBus(queue <Bus> Buses) {
         Bus firstBus = Buses.front();
-        //Buses.pop();
         return firstBus;
     };
+    
     void WhatEnter (Bus bus) {
-     //   Gate gate;
+        this_thread::sleep_for(chrono::milliseconds(1000));
         if (bus.numberOfTypeProduct == 1) {
             
             if (Gates[1].howMuch < 50) {
-//                gate = Gates[1];
-                TIME[1] += 2;
                 Gates[1].whatProduct = 1;
                 Gates[1].LoadingOrUploading = 1;
                 Gates[1].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
             else if ((Gates[0].howMuch < 50 && Gates[0].whatProduct == 1) || Gates[0].howMuch == 0) {
-//                gate = Gates[0];
-                TIME[0] += 2;
                 Gates[0].whatProduct = 1;
                 Gates[0].LoadingOrUploading = 1;
                 Gates[0].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
             else if ((Gates[4].howMuch < 50 && Gates[4].whatProduct == 1) || Gates[4].howMuch == 0) {
-//                gate = Gates[4];
-                TIME[4] += 2;
                Gates[4].whatProduct = 1;
                 Gates[4].LoadingOrUploading = 1;
                 Gates[4].howMuch += bus.countOfTonInABus;
@@ -144,25 +120,19 @@ public:
         }
         else if (bus.numberOfTypeProduct == 2) {
             if (Gates[2].howMuch < 50) {
-//                gate = Gates[2];
-                TIME[2] += 2;
                 Gates[2].whatProduct = 2;
                 Gates[2].LoadingOrUploading = 1;
                 Gates[2].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
             else if ((Gates[0].howMuch < 50 && Gates[0].whatProduct == 2) || Gates[0].howMuch == 0) {
-//                gate = Gates[0];
-                TIME[0] += 2;
                 Gates[0].whatProduct = 2;
                 Gates[0].LoadingOrUploading = 1;
                 Gates[0].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
             else if ((Gates[4].howMuch < 50 && Gates[4].whatProduct == 2) || Gates[4].howMuch == 0) {
-//                gate = Gates[4];
-                TIME[4] += 2;
-              Gates[4].whatProduct = 2;
+                Gates[4].whatProduct = 2;
                 Gates[4].LoadingOrUploading = 1;
                 Gates[4].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
@@ -170,137 +140,144 @@ public:
         }
         else if (bus.numberOfTypeProduct == 3) {
             if (Gates[3].howMuch < 50) {
-//                gate = Gates[3];
-                TIME[3] += 2;
                 Gates[3].whatProduct = 3;
                 Gates[3].LoadingOrUploading = 1;
                 Gates[3].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
             else if ((Gates[0].howMuch < 50 && Gates[0].whatProduct == 3) || Gates[0].howMuch == 0) {
-//                gate = Gates[0];
                 Gates[0].whatProduct = 3;
-                TIME[0] += 2;
                 Gates[0].LoadingOrUploading = 1;
                 Gates[0].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
             else if ((Gates[4].howMuch < 50 && Gates[4].whatProduct == 3) || Gates[4].howMuch == 0) {
-//                gate = Gates[4];
-                TIME[4] += 2;
-               Gates[4].whatProduct = 3;
+                Gates[4].whatProduct = 3;
                 Gates[4].LoadingOrUploading = 1;
                 Gates[4].howMuch += bus.countOfTonInABus;
                 bus.countOfTonInABus = 0;
             }
-           
         }
-        cout << "uploaded BUS"<< endl;
-        this_thread::sleep_for(chrono::milliseconds(2000));
-        //  WhatExit();
+        this_thread::sleep_for(chrono::milliseconds(1000));
+        cout << endl << "/////////------Машина выгружена за 2 часа------/////////" << endl << endl;
+        
     };
     void WhatExit() {
+        this_thread::sleep_for(chrono::milliseconds(2000));
         int maxOfGates = 0;
-        int max = -1;
+        int max = 0;
             for (int i=0; i<5; i++){
-                if (Gates[i].howMuch > max) {
+                if (Gates[i].howMuch >= max) {
                     max = Gates[i].howMuch;
                     maxOfGates = i;
                 }
             }
         if (Gates[maxOfGates].howMuch >= 50) {
-            TIME[maxOfGates] += 2;
-            TIMEG += 2;
             Gates[maxOfGates].howMuch -= 50;
             Gates[maxOfGates].LoadingOrUploading = 0;
-          //  Buses.push(bus);
         }
-//        for (int i=0; i<5; i++){
-//            cout << "G " << i << " =  " << Gates[i].howMuch<< endl;
-//        }
-        this_thread::sleep_for(chrono::milliseconds(2000));
     };
     
     
 };
-void thread1(){
+int TIME = 0;
+void thread1() {
     int count = 0;
-    cout<< "START"<< endl;
     BUSES B;
     Gates = Gat(Gates);
     while(true) {
-   // if (TIME <= 24) {
-//        TIME = 0;
-        
+        cout << "////////////////Начало работы 1 потока///////////////" << endl;
         count++;
         B.GenerateBuses(Buses1);
-        this_thread::sleep_for(chrono::milliseconds(24000));
-       // if (count == 5)
-        //    break;
-        
-     //   cout << "TIME  "<<TIME<< endl;
-   // }
-     //   this_thread::sleep_for(chrono::milliseconds(1000));
-        cout<< "FINISH"<< endl;
+        for (int i =0 ; i<24;i++) {
+            this_thread::sleep_for(chrono::milliseconds(1000));
+            TIME++;
+        }
+        TIME = 0;
+        cout << "////////////////Конец работы 1 потока///////////////" << endl;
     }
-    
 }
-void thread2(){
+
+void thread2() {
     int count = 0;
-    cout<< "START222222"<< endl;
     BUSES B;
-    Gates = Gat(Gates);
+    this_thread::sleep_for(chrono::milliseconds(1000));
     while(true) {
-   // if (TIME <= 24) {
-//        TIME = 0;
+        
+        count++;
+        if(Buses1.size() != 0) {
+            cout<< "////////////////Начало работы 2 потока///////////////"<< endl;
+            B.GenerateBuses2(Buses1);
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+        else {
+            for ( int i = 0; i < TIME; i++){
+                this_thread::sleep_for(chrono::milliseconds(1000));
+            }
+            cout<< "////////////////Конец работы 2 потока///////////////"<< endl;
+        }
+        
+    }
+}
+
+void thread21() {
+    int count = 0;
+    this_thread::sleep_for(chrono::milliseconds(2000));
+    cout<< "////////////////Начало работы 2.1 потока///////////////"<< endl;
+    BUSES B;
+    while(true) {
         count++;
         B.GenerateBuses2(Buses1);
-       // if (count == 5)
-        //    break;
-        cout<< "FINISH22222"<< endl;
-     //   cout << "TIME  "<<TIME<< endl;
-   // }
-    
+        this_thread::sleep_for(chrono::milliseconds(2000));
+        cout<< "////////////////Конец работы 2.1 потока///////////////"<< endl;
     }
 }
-void thread21(){
-    int count = 0;
-    cout<< "START2222222111111"<< endl;
+
+void thread3() {
     BUSES B;
-    Gates = Gat(Gates);
-    while(true) {
-   // if (TIME <= 24) {
-//        TIME = 0;
-        count++;
-        B.GenerateBuses2(Buses1);
-       // if (count == 5)
-        //    break;
-        cout<< "FINISH2222222111111"<< endl;
-     //   cout << "TIME  "<<TIME<< endl;
-   // }
-    
-    }
-}
-void thread3(){
-    BUSES B;
-    cout<< "START333333"<< endl;
+    this_thread::sleep_for(chrono::milliseconds(1000));
     int count = 0;
     while(true) {
-   // if (TIME <= 24) {
-//        TIME = 0;
+    //    cout<< "////////////////Начало работы 3 потока///////////////"<< endl;
         count++;
-        B.WhatExit();
-       // if (count == 20)
-        //    break;
-        
-     //   cout << "TIME  "<<TIME<< endl;
-   // }
-        cout<< "FINISH3333333"<< endl;
+     //   B.WhatExit();
+        if(Buses1.size() != 0) {
+            cout<< "////////////////Начало работы 3 потока///////////////"<< endl;
+            B.WhatExit();
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+        else {
+            for ( int i = 0; i < TIME; i++){
+                this_thread::sleep_for(chrono::milliseconds(1000));
+            }
+            cout<< "////////////////Конец работы 3 потока///////////////"<< endl;
+        }
+      //  this_thread::sleep_for(chrono::milliseconds(2000));
+      //  cout<< "////////////////Конец работы 3 потока///////////////"<< endl;
     }
 }
+
+
 int main() {
+    setlocale(LC_ALL, "Russian");
+//    int count = 0;
+    thread t1(thread1);
+    thread t2(thread2);
+  //  thread t21(thread21);
+    thread t3(thread3);
+//    while(true) {
+//        count++;
+//      //  cout<<"MAIN"<<endl;   //вывод текущего потока
+//        this_thread::sleep_for(chrono::milliseconds(1000));
+//    }
    
-//  thread th(print);
+    t2.join();
+  //  t21.join();
+    t3.join();
+    t1.join();
+    return 0;
+}
+//  thread th(print, a, b);
 //  th.detach();//по очереди каждая итерация оборвется th если разное количество итераций
 //  th.join();//если после вызывать то как будто в одном потоке будет надо ставить где нужн
 //  cout<<this_thread::get_id()<<"  "<<i<<endl;   //вывод текущего потока
@@ -308,63 +285,3 @@ int main() {
 //  th.join();
 //  this_thread::sleep_for(chrono::milliseconds(1000));  //приостанавливает работу текущего потока на нек время
     
-  int count = 0;
-//    BUSES B;
-//    Gates = Gat(Gates);
-//    while(true) {
-//   // if (TIME <= 24) {
-////        TIME = 0;
-//        count++;
-//        Buses1 = B.GenerateBuses(Buses1);
-//        if (count == 5)
-//            break;
-//
-//     //   cout << "TIME  "<<TIME<< endl;
-//   // }
-////
-//    }
-    
-   // thread t1(thread1);
-  //  thread t2(thread2);
-  //  thread t3(thread3);
-   // this_thread::sleep_for(chrono::milliseconds(10000));
-   // thread t1(thread1);
-    thread t1(thread1);
-    thread t2(thread2);
-    thread t21(thread21);
-    thread t3(thread3);
-    while(true) {
-//        thread t1(thread1);
-        count++;
-        cout<<"MAIN"<<endl;   //вывод текущего потока
-        this_thread::sleep_for(chrono::milliseconds(1000));
-        
-//        count++;
-//        cout<<endl<<"1=  "<< this_thread::get_id()<<"  "<<endl<<endl;   //вывод текущего потока
-//        this_thread::sleep_for(chrono::milliseconds(1000));
-        //t1.sleep_for(milliseconds(10000));
-       // continue;
-//        t2.join();
-//        cout<<"2=  "<< this_thread::get_id()<<"  "<<endl;   //вывод текущего потока
-//        this_thread::sleep_for(chrono::milliseconds(2000));
-//        t3.join();
-//        cout<<"3=  "<< this_thread::get_id()<<"  "<<endl;   //вывод текущего потока
-//        this_thread::sleep_for(chrono::milliseconds(2000));
-       // t1.join();
-    }
-    t1.join();
-    t2.join();
-    t21.join();
-    t3.join();
-        
-   // thread t2(thread2);
- //   thread t3(thread3);
-  //  this_thread::sleep_for(chrono::milliseconds(1000));
-    
-  
-    
-
-  //  bus = B.ReturnFirstBus(Buses1);
-   // cout <<"A "<< bus.countOfTonInABus <<"  "<<bus.numberOfTypeProduct << endl;
-    return 0;
-}
