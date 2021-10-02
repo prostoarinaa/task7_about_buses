@@ -11,7 +11,7 @@
 
 using namespace std;
 using namespace chrono;
-
+mutex mtx, mtx1;
 struct Bus {
     int countOfTonInABus;
     int numberOfTypeProduct;
@@ -150,6 +150,26 @@ void thread2() {
         }
     }
 };
+void thread21() {
+    int count = 0;
+    BUSES B;
+    this_thread::sleep_for(chrono::milliseconds(1000));
+    while(true) {
+        
+        count++;
+        if(Buses1.size() != 0) {
+            cout<< "////////////////Начало работы 21 потока///////////////"<< endl;
+            B.GenerateBuses2(Buses1);
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+        else {
+            for ( int i = 0; i < TIME; i++){
+                this_thread::sleep_for(chrono::milliseconds(1000));
+            }
+            cout<< "////////////////Конец работы 21 потока///////////////"<< endl;
+        }
+    }
+};
 
 void thread3() {
     BUSES B;
@@ -174,8 +194,10 @@ void thread3() {
 void START() {
     thread t1(thread1);
     thread t2(thread2);
+    thread t21(thread21);
     thread t3(thread3);
     t2.join();
+    t21.join();
     t3.join();
     t1.join();
 }
@@ -185,21 +207,32 @@ void START() {
 
 
 queue <Bus> BUSES::GenerateBuses (queue <Bus>& Buses) {
+    mtx.lock();
     this_thread::sleep_for(chrono::milliseconds(10));
     int countOfBus = rand()%30 + 1;
     cout << "----Количество автобусов, генерируемых каждые 24 часа = " << countOfBus <<"-----"<< endl;
     for (int i = 0; i < countOfBus; i++) {
         Buses = AddNewBus(Buses);
     }
+    mtx.unlock();
 return Buses;
 };
 
 queue <Bus> BUSES::GenerateBuses2 (queue <Bus>& Buses) {
+    mtx.lock();
+    mtx1.lock();
         unsigned long k = Buses.size();
         unsigned long g = Gates.size();
+    mtx1.unlock();
         for (int i = 0; i < k; i++) {
+            
+            
             Bus B = Buses.front();
+            
             WhatEnter(B);
+            
+            Buses.pop();
+           
             cout << "---------Текущее положение ворот, машины и склада с продуктами--------" << endl;
             this_thread::sleep_for(chrono::milliseconds(10));
             cout << "BUS № " << i << ", Тонн " << B.countOfTonInABus << ", Продукт № " << B.numberOfTypeProduct << endl << endl;
@@ -214,8 +247,9 @@ queue <Bus> BUSES::GenerateBuses2 (queue <Bus>& Buses) {
                 this_thread::sleep_for(chrono::milliseconds(10));
             }
             cout << "-------------------------------------------------------------------" << endl << endl<< endl;
-            Buses.pop();
+//            Buses.pop();
         }
+    mtx.unlock();
     return Buses;
 };
 
