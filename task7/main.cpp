@@ -35,11 +35,12 @@ vector <Gate> Gates ;
 vector <Product> Products ;
 queue <Bus> Buses1 = {};
 int TIME = 0;
+unsigned long numOfBus = 0;
 
 class BUSES {
 public:
     queue <Bus> GenerateBuses (queue <Bus>& Buses);
-    queue <Bus> GenerateBuses2 (queue <Bus>& Buses);
+    void GenerateBuses2 (Bus bus, unsigned long numOfbus);
     queue <Bus> AddNewBus(queue <Bus> Buses);
     Bus ReturnFirstBus(queue <Bus> Buses);
     void WhatEnter (Bus bus);
@@ -126,43 +127,57 @@ void thread1() {
             TIME--;
         }
         TIME = 0;
+        numOfBus = 0;
         cout << "////////////////Конец работы 1 потока///////////////" << endl;
     }
 }
 
 void thread2() {
-    int count = 0;
-    BUSES B;
+    
+    BUSES BUS;
     this_thread::sleep_for(chrono::milliseconds(1000));
     while(true) {
-        
-        count++;
-        if(Buses1.size() != 0) {
+     //   unsigned long count = Buses1.size();
+        //count++;
+        while (Buses1.size() > 0) {
             cout<< "////////////////Начало работы 2 потока///////////////"<< endl;
-            B.GenerateBuses2(Buses1);
+            Bus B = Buses1.front();
+            numOfBus++;
+//            WhatEnter(B);
+            
+            Buses1.pop();
+            BUS.GenerateBuses2(B, numOfBus);
+           
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-        else {
+        if (Buses1.size() == 0) {
             for ( int i = 0; i < TIME; i++){
                 this_thread::sleep_for(chrono::milliseconds(1000));
             }
-            cout<< "////////////////Конец работы 2 потока///////////////"<< endl;
+           // cout<< "////////////////Конец работы 2 потока///////////////"<< endl;
         }
+        cout<< "////////////////Конец работы 2 потока///////////////"<< endl;
     }
 };
+mutex mmm, mmmm;
 void thread21() {
     int count = 0;
-    BUSES B;
+    BUSES BUS;
     this_thread::sleep_for(chrono::milliseconds(1000));
     while(true) {
         
         count++;
-        if(Buses1.size() != 0) {
+        while (Buses1.size() > 0) {
             cout<< "////////////////Начало работы 21 потока///////////////"<< endl;
-            B.GenerateBuses2(Buses1);
+            Bus B = Buses1.front();
+            numOfBus++;
+//            WhatEnter(B);
+            Buses1.pop();
+            BUS.GenerateBuses2(B, numOfBus);
+            
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-        else {
+        if (Buses1.size() == 0) {
             for ( int i = 0; i < TIME; i++){
                 this_thread::sleep_for(chrono::milliseconds(1000));
             }
@@ -207,50 +222,55 @@ void START() {
 
 
 queue <Bus> BUSES::GenerateBuses (queue <Bus>& Buses) {
-    mtx.lock();
+// mtx.lock();
+   // mmm.lock();
     this_thread::sleep_for(chrono::milliseconds(10));
     int countOfBus = rand()%30 + 1;
     cout << "----Количество автобусов, генерируемых каждые 24 часа = " << countOfBus <<"-----"<< endl;
     for (int i = 0; i < countOfBus; i++) {
         Buses = AddNewBus(Buses);
     }
-    mtx.unlock();
+   // mmm.unlock();
+ // mtx.unlock();
 return Buses;
 };
 
-queue <Bus> BUSES::GenerateBuses2 (queue <Bus>& Buses) {
-    mtx.lock();
+void BUSES::GenerateBuses2 (Bus bus, unsigned long numOfbus) { //распределяет автобусов по воротам
+   // mtx.lock();
+    //int i = 0;
+  //  mtx.lock();
+     //   unsigned long k = Buses.size();
+    //    unsigned long g = Gates.size();
+    
+   // mtx.unlock();
+ //   while (Buses.size() > 0) {
+            
+         //  i++;
+          //  Bus B = Buses.front();
+            
+            WhatEnter(bus);
+            
+          //  Buses.pop();
     mtx1.lock();
-        unsigned long k = Buses.size();
-        unsigned long g = Gates.size();
-    mtx1.unlock();
-        for (int i = 0; i < k; i++) {
-            
-            
-            Bus B = Buses.front();
-            
-            WhatEnter(B);
-            
-            Buses.pop();
-           
             cout << "---------Текущее положение ворот, машины и склада с продуктами--------" << endl;
             this_thread::sleep_for(chrono::milliseconds(10));
-            cout << "BUS № " << i << ", Тонн " << B.countOfTonInABus << ", Продукт № " << B.numberOfTypeProduct << endl << endl;
+            cout << "BUS № " << numOfbus << ", Тонн " << bus.countOfTonInABus << ", Продукт № " << bus.numberOfTypeProduct << endl << endl;
             for (int i = 0; i < 3; i++) {
                 Product product = Products[i];
                 cout <<"---PRODUCT на складе, тип №: " << product.whatProduct << " , в количестве " << product.howMuch << " ----" << endl;
             }
-            for (int i = 0; i < g; i++) {
+            for (int i = 0; i < 5; i++) {
                 Gate G = Gates[i];
                 this_thread::sleep_for(chrono::milliseconds(10));
                 cout << "GATE № " << i << ", Продукт № " << G.whatProduct  << ", положение " << G.LoadingOrUploading << endl;
                 this_thread::sleep_for(chrono::milliseconds(10));
             }
             cout << "-------------------------------------------------------------------" << endl << endl<< endl;
+    mtx1.unlock();
 //            Buses.pop();
-        }
-    mtx.unlock();
-    return Buses;
+        
+   // mtx.unlock();
+//    return bus;
 };
 
 queue <Bus> BUSES::AddNewBus(queue <Bus> Buses) {
@@ -265,68 +285,86 @@ Bus BUSES::ReturnFirstBus(queue <Bus> Buses) {
     Bus firstBus = Buses.front();
     return firstBus;
 };
-
+mutex m1,m2,m3,m0,m4;
 void BUSES::WhatEnter (Bus bus) {
     this_thread::sleep_for(chrono::milliseconds(1000));
     if (bus.numberOfTypeProduct == 1) {
         
         if (Products[0].howMuch < 50) {
+            m1.lock();
             Gates[1].whatProduct = 1;
             Gates[1].LoadingOrUploading = 1;
             Products[0].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m1.unlock();
         }
         else if ((Products[0].howMuch < 50 && Gates[0].whatProduct == 1) || Gates[0].howMuch == 0) {
+            m0.lock();
             Gates[0].whatProduct = 1;
             Gates[0].LoadingOrUploading = 1;
             Products[0].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m0.unlock();
         }
         else if ((Products[0].howMuch < 50 && Gates[4].whatProduct == 1) || Gates[4].howMuch == 0) {
+            m4.lock();
             Gates[4].whatProduct = 1;
             Gates[4].LoadingOrUploading = 1;
             Products[0].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m4.unlock();
         }
     }
     else if (bus.numberOfTypeProduct == 2) {
         if (Products[1].howMuch < 50) {
+            m2.lock();
             Gates[2].whatProduct = 2;
             Gates[2].LoadingOrUploading = 1;
             Products[1].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m2.unlock();
         }
         else if ((Products[1].howMuch < 50 && Gates[0].whatProduct == 2) || Gates[0].howMuch == 0) {
+            m0.lock();
             Gates[0].whatProduct = 2;
             Gates[0].LoadingOrUploading = 1;
             Products[1].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m0.unlock();
         }
         else if ((Products[1].howMuch < 50 && Gates[4].whatProduct == 2) || Gates[4].howMuch == 0) {
+            m4.lock();
             Gates[4].whatProduct = 2;
             Gates[4].LoadingOrUploading = 1;
             Products[1].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m4.unlock();
         }
     }
     else if (bus.numberOfTypeProduct == 3) {
         if (Products[2].howMuch < 50) {
+            m3.lock();
             Gates[3].whatProduct = 3;
             Gates[3].LoadingOrUploading = 1;
             Products[2].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m3.unlock();
         }
         else if ((Products[2].howMuch < 50 && Gates[0].whatProduct == 3) || Gates[0].howMuch == 0) {
+            m0.lock();
             Gates[0].whatProduct = 3;
             Gates[0].LoadingOrUploading = 1;
             Products[2].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m0.unlock();
         }
         else if ((Products[2].howMuch < 50 && Gates[4].whatProduct == 3) || Gates[4].howMuch == 0) {
+            m4.lock();
             Gates[4].whatProduct = 3;
             Gates[4].LoadingOrUploading = 1;
             Products[2].howMuch += bus.countOfTonInABus;
             bus.countOfTonInABus = 0;
+            m4.unlock();
         }
     }
     this_thread::sleep_for(chrono::milliseconds(1000));
